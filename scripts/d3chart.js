@@ -5,13 +5,16 @@ class Chart {
             id: "ID" + Math.floor(Math.random() * 1000000),
             svgWidth: 400,
             svgHeight: 200,
-            marginTop: 5,
-            marginBottom: 5,
+            marginTop: 15,
+            marginBottom: 25,
             marginRight: 5,
-            marginLeft: 5,
+            marginLeft: 55,
+            colors: {
+                neutral10: '#EBEBEB',
+            },
             container: "body",
             defaultTextFill: "#2C3E50",
-            defaultFont: "Helvetica",
+            defaultFont: "Open Sans",
             data: null,
             chartWidth: null,
             chartHeight: null
@@ -37,7 +40,7 @@ class Chart {
         this.initializeEnterExitUpdatePattern();
     }
 
-    
+
     render() {
         this.setDynamicContainer();
         this.calculateProperties();
@@ -74,17 +77,139 @@ class Chart {
     }
 
     drawRects() {
-        const { chart, data, chartWidth, chartHeight } = this.getState();
+        const { chart, colors, data, chartWidth, chartHeight } = this.getState();
 
-        chart
-            ._add({
-                tag: "rect",
-                selector: "rect-sample",
-                data: [data]
+        data.groups.forEach(group => {
+            let val = 0;
+            group.values.forEach(valueObj => {
+                valueObj.cumsum = val;
+                val += valueObj.value;
+
             })
-            .attr("width", chartWidth)
-            .attr("height", chartHeight)
-            .attr("fill", (d) => d.color);
+        })
+
+        // Y Axis
+        const scaleY = d3.scaleLinear()
+            .domain([data.yMin, data.yMax])
+            .range([chartHeight, 0])
+
+        const yAxis = d3.axisLeft(scaleY).tickFormat(d => d + data.unit).ticks(5)
+            .tickSize(-chartWidth)
+
+        const yAxisWrapper = chart._add({
+            tag: 'g',
+            className: 'y-axis-group'
+        })
+        yAxisWrapper.transition().call(yAxis)
+        yAxisWrapper.selectAll('.domain').remove()
+        yAxisWrapper.selectAll('text').attr('font-size', 16).attr('font-weight', 300).attr('x', -10)
+        yAxisWrapper.selectAll('.tick line')
+            .attr('stroke', colors.neutral10)
+
+        // X Axis
+        const margin = 20;
+        const scaleX = d3.scaleBand()
+            .domain(data.groups.map(d => d.name))
+            .range([0 + margin, chartWidth - margin])
+            .paddingInner(0.5)
+
+        const xAxis = d3.axisBottom(scaleX)
+
+        const xAxisWrapper = chart._add({
+            tag: 'g',
+            className: 'x-axis-group'
+        })
+            .attr('transform', `translate(0,${chartHeight})`)
+
+        xAxisWrapper.transition().call(xAxis)
+        xAxisWrapper.selectAll('.tick line').remove()
+        xAxisWrapper.selectAll('.domain').remove()
+        xAxisWrapper.selectAll('text').attr('font-size', 16).attr('font-weight', 300)
+        xAxisWrapper._add({
+            tag: 'line',
+            className: 'horizontal-line'
+        })
+            .attr('x1', 0)
+            .attr('x2', chartWidth)
+            .attr('y0', 0)
+            .attr('y1', 0)
+            .attr('stroke', 'black')
+            .attr('stroke-width', 0.5)
+
+
+        // Background-rects
+        const barWrappers = chart._add({
+            tag: 'g',
+            className: 'bar-wrappers',
+            data: data.groups
+        })
+            .attr('transform', d => `translate(${scaleX(d.name)},0)`)
+
+        const barBackground = barWrappers._add({
+            tag: 'path',
+            className: 'bar-background'
+        })
+            .attr('fill', 'white')
+            .attr('d', (d) => {
+                const width = scaleX.bandwidth();
+                const height = chartHeight - 1;
+                const roundness = width / 8;
+                return `M0 ${height} 
+                        V${roundness} 
+                        Q0 0 ${roundness} 0 
+                        
+                        H${width - roundness}  
+                        Q${width} ${0} ${width} ${roundness} 
+                        V${height}z`
+            })
+
+        barWrappers._add({
+            tag: 'path',
+            className: 'bars',
+            data: d => d.values
+        })
+
+            .attr('fill', d => d.color)
+            .attr('d', function (d) {
+                const initialTransform = `M0 ${chartHeight} V${chartHeight} Q0 ${chartHeight} 0 ${chartHeight} H${scaleX.bandwidth()}  Q${scaleX.bandwidth()} ${chartHeight} ${scaleX.bandwidth()} ${chartHeight}  V${chartHeight}z`
+                const currentTransform = d3.select(this).attr('d')
+                if (currentTransform) return currentTransform;
+                return initialTransform
+            })
+            .transition()
+
+            .transition()
+            .attr('d', (d, i) => {
+                const width = scaleX.bandwidth();
+                const height = scaleY(0) - scaleY(d.value);
+                const y = chartHeight - scaleY(d.cumsum)
+                let roundness = width / 8;
+                if (height < roundness) {
+                    roundness = height;
+                }
+                let startY = chartHeight - y + roundness
+                let roundnessDiff = 0;
+                if (startY > chartHeight) {
+                    roundnessDiff = startY - chartHeight
+                    startY = chartHeight
+
+                }
+                const endY = startY - height - roundness - roundnessDiff;
+                console.log({ startY, endY, y, height, val: d.value, name: d.name, cumsum: d.cumsum })
+                return `M0 ${startY} 
+                            V${endY + roundness} 
+                            Q0 ${endY} ${roundness} ${endY} 
+                            H${width - roundness}  
+                            Q${width} ${endY} ${width} ${endY + roundness} 
+                            V${startY}z`
+            })
+            .each(function () {
+                d3.select(this).lower()
+            })
+
+        barBackground.lower()
+
+
     }
 
     drawSvgAndWrappers() {
@@ -120,15 +245,7 @@ class Chart {
                 "translate(" + calc.chartLeftMargin + "," + calc.chartTopMargin + ")"
             );
 
-        chart
-            ._add({
-                tag: "rect",
-                selector: "rect-sample",
-                data: [data]
-            })
-            .attr("width", chartWidth)
-            .attr("height", chartHeight)
-            .attr("fill", (d) => d.color);
+
 
         this.setState({ chart, svg });
     }
@@ -174,7 +291,7 @@ class Chart {
         var containerRect = d3Container.node().getBoundingClientRect();
         if (containerRect.width > 0) attrs.svgWidth = containerRect.width;
 
-        d3.select(window).on("resize." + attrs.id, function () {
+        d3.select(window).on("resize." + attrs.id, () => {
             var containerRect = d3Container.node().getBoundingClientRect();
             if (containerRect.width > 0) attrs.svgWidth = containerRect.width;
             this.render();

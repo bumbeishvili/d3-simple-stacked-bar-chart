@@ -1,1 +1,158 @@
-{ "color": "red" }
+{
+    "color": "red",
+    "unit": "%",
+    "yMin": 0,
+    "yMax": 100,
+    "groups": [
+        {
+            "name": 2018,
+            "values": [
+                {
+                    "name": "No Action",
+                    "value": 0,
+                    "color": "white"
+                },
+                {
+                    "name": "Planned response",
+                    "value": 1,
+                    "color": "#ACD3F1"
+                },
+                {
+                    "name": "Initial response",
+                    "value": 18,
+                    "color": "#1786D7"
+                },
+                {
+                    "name": "Partial response",
+                    "value": 1,
+                    "color": "#126AAA"
+                },
+                {
+                    "name": "Full response",
+                    "value": 1,
+                    "color": "#0D4E7C"
+                }
+            ]
+        },
+        {
+            "name": 2019,
+            "values": [
+                {
+                    "name": "No Action",
+                    "value": 0,
+                    "color": "white"
+                },
+                {
+                    "name": "Planned response",
+                    "value": 5,
+                    "color": "#ACD3F1"
+                },
+                {
+                    "name": "Initial response",
+                    "value": 22,
+                    "color": "#1786D7"
+                },
+                {
+                    "name": "Partial response",
+                    "value": 1,
+                    "color": "#126AAA"
+                },
+                {
+                    "name": "Full response",
+                    "value": 3,
+                    "color": "#0D4E7C"
+                }
+            ]
+        },
+        {
+            "name": 2020,
+            "values": [
+                {
+                    "name": "No Action",
+                    "value": 0,
+                    "color": "white"
+                },
+                {
+                    "name": "Planned response",
+                    "value": 5,
+                    "color": "#ACD3F1"
+                },
+                {
+                    "name": "Initial response",
+                    "value": 22,
+                    "color": "#1786D7"
+                },
+                {
+                    "name": "Partial response",
+                    "value": 1,
+                    "color": "#126AAA"
+                },
+                {
+                    "name": "Full response",
+                    "value": 33,
+                    "color": "#0D4E7C"
+                }
+            ]
+        },
+        {
+            "name": 2021,
+            "values": [
+                {
+                    "name": "No Action",
+                    "value": 0,
+                    "color": "white"
+                },
+                {
+                    "name": "Planned response",
+                    "value": 5,
+                    "color": "#ACD3F1"
+                },
+                {
+                    "name": "Initial response",
+                    "value": 22,
+                    "color": "#1786D7"
+                },
+                {
+                    "name": "Partial response",
+                    "value": 41,
+                    "color": "#126AAA"
+                },
+                {
+                    "name": "Full response",
+                    "value": 3,
+                    "color": "#0D4E7C"
+                }
+            ]
+        },
+        {
+            "name": 2022,
+            "values": [
+                {
+                    "name": "No Action",
+                    "value": 0,
+                    "color": "white"
+                },
+                {
+                    "name": "Planned response",
+                    "value": 5,
+                    "color": "#ACD3F1"
+                },
+                {
+                    "name": "Initial response",
+                    "value": 22,
+                    "color": "#1786D7"
+                },
+                {
+                    "name": "Partial response",
+                    "value": 51,
+                    "color": "#126AAA"
+                },
+                {
+                    "name": "Full response",
+                    "value": 3,
+                    "color": "#0D4E7C"
+                }
+            ]
+        }
+    ]
+}
